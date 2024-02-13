@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import numpy as np
 import pandas as pd
 
@@ -22,18 +24,18 @@ def transformSpeciesColumnIntoOneOutOfKEncoding(data: np.ndarray) -> np.ndarray:
     return np.concatenate((data[:, :-1], speciesEncoding), axis=1)
 
 
-rawData = importRawData()
-X = transformSpeciesColumnIntoOneOutOfKEncoding(rawData)
-attributeNames = [
-    'Area A',
-    'perimeter P',
-    'compactness C',
-    'length of kernel',
-    'width of kernel',
-    'asymmetry coefficient',
-    'length of kernel groove',
-    'Kama', 'Rosa', 'Canadian'
-]
+def importData() -> Tuple[np.ndarray, List]:
+    rawData = importRawData()
+    X = transformSpeciesColumnIntoOneOutOfKEncoding(rawData)
+    attributeNames = [
+        'Area A',
+        'perimeter P',
+        'compactness C',
+        'length of kernel',
+        'width of kernel',
+        'asymmetry coefficient',
+        'length of kernel groove',
+        'Kama', 'Rosa', 'Canadian'
+    ]
+    return X, attributeNames
 
-
-print('hi')
