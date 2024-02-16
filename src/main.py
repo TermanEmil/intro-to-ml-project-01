@@ -1,3 +1,4 @@
+import dataclasses
 from dataclasses import dataclass
 from functools import cached_property
 from typing import List, Tuple
@@ -53,9 +54,10 @@ class MlData:
     def observationsCount(self):
         return len(self.classLabels)
 
-    def toCentered(self) -> 'MlData':
-        self.X = self.X - np.ones((self.observationsCount, 1)) * self.X.mean(axis=0)
-        return self
+    def centered(self):
+        data = dataclasses.replace(self)
+        data.X = data.X - np.ones((data.observationsCount, 1)) * data.X.mean(axis=0)
+        return data
 
 
 def importData2() -> MlData:
