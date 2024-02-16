@@ -2,6 +2,7 @@ import dataclasses
 from dataclasses import dataclass
 from functools import cached_property
 from typing import List, Tuple
+from scipy import linalg
 
 import numpy as np
 import pandas as pd
@@ -65,6 +66,28 @@ class MlData:
         data = self.centered()
         data.X = data.X * (1 / np.std(data.X, axis=0))
         return data
+
+    # noinspection PyTupleAssignmentBalance
+    def computePca(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        :return: (
+            U matrix from svd();
+            S matrix from svd();
+            V matrix from svd() but transposed;
+            Z matrix with the data projected onto PCA space;
+        )
+        """
+
+        # PCA by computing SVD of Y
+        U, S, Vh = linalg.svd(self.X, full_matrices=False)
+
+        # scipy.linalg.svd returns "Vh", which is the Hermitian (transpose)
+        # of the vector V. So, for us to obtain the correct V, we transpose:
+        V = Vh.T
+
+        # Project the centered data onto principal component space
+        Z = self.X @ V
+        return U, S, V, Z
 
 
 def importData2() -> MlData:
