@@ -3,7 +3,7 @@ from matplotlib import pyplot
 from main import importData2
 
 
-def visualise():
+def visualise2DAttributes():
     data = importData2()
 
     attributeCombos = [
@@ -21,7 +21,9 @@ def visualise():
             ax.plot(xData, yData, 'o', alpha=0.3)
         ax.set_xlabel(data.attributeNames[attributeIndex1])
         ax.set_ylabel(data.attributeNames[attributeIndex2])
+        ax.legend(data.classNames)
+
     pyplot.show()
 
 
-visualise()
+visualise2DAttributes()
