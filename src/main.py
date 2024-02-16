@@ -51,9 +51,13 @@ class MlData:
     X: np.ndarray
     classLabels: np.ndarray
 
-    @cached_property
+    @property
     def observationsCount(self):
         return len(self.classLabels)
+
+    @property
+    def attributesCount(self):
+        return self.X.shape[1]
 
     def centered(self) -> 'MlData':
         # Subtract the mean from the data
@@ -104,6 +108,6 @@ def importData2() -> MlData:
         'width of kernel',
         'asymmetry coefficient',
         'length of kernel groove',
-    ] + classNames
+    ]
     classLabels = rawData[:, -1] - 1
     return MlData(classNames=classNames, attributeNames=attributeNames, X=X, classLabels=classLabels)
