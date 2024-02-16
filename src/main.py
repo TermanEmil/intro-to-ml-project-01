@@ -54,9 +54,16 @@ class MlData:
     def observationsCount(self):
         return len(self.classLabels)
 
-    def centered(self):
+    def centered(self) -> 'MlData':
+        # Subtract the mean from the data
         data = dataclasses.replace(self)
         data.X = data.X - np.ones((data.observationsCount, 1)) * data.X.mean(axis=0)
+        return data
+
+    def standardized(self) -> 'MlData':
+        # Center and divide by the attribute standard deviation to obtain a standardized dataset
+        data = self.centered()
+        data.X = data.X * (1 / np.std(data.X, axis=0))
         return data
 
 
