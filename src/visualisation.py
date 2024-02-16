@@ -62,17 +62,20 @@ def visualisePcaCoefficients():
     data = importData2().standardized()
     U, S, V, Z = data.computePca()
 
+    figure = plt.figure()
+    ax = figure.add_subplot()
+    figure.suptitle("PCA Component Coefficients")
+
     pcasCount = data.attributesCount
     bw = 0.1
     r = np.arange(1, data.attributesCount + 1)
     for i in range(pcasCount):
-        plt.bar(r + i * bw, V[:, i], width=bw)
-    plt.xticks(r + bw, data.attributeNames)
-    plt.xlabel("Attributes")
-    plt.ylabel("Component coefficients")
-    plt.legend([f'PC{i + 1}' for i in range(pcasCount)])
-    plt.grid()
-    plt.title("PCA Component Coefficients")
+        ax.bar(r + i * bw, V[:, i], width=bw)
+    ax.set_xticks(r + bw, data.attributeNames)
+    ax.set_xlabel("Attributes")
+    ax.set_ylabel("Component coefficients")
+    ax.legend([f'PC{i + 1}' for i in range(pcasCount)])
+    ax.grid()
 
 
 visualise2DAttributes()
