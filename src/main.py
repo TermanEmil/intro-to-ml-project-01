@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from functools import cached_property
 from typing import List, Tuple
 
 import numpy as np
@@ -39,3 +41,37 @@ def importData() -> Tuple[np.ndarray, List]:
     ]
     return X, attributeNames
 
+
+@dataclass
+class MlData:
+    classNames: List[str]
+    attributeNames: List[str]
+    X: np.ndarray
+    classLabels: np.ndarray
+
+    @cached_property
+    def observationsCount(self):
+        return len(self.classLabels)
+
+    def toCentered(self) -> 'MlData':
+        self.X = self.X - np.ones((self.observationsCount, 1)) * self.X.mean(axis=0)
+        return self
+
+
+def importData2() -> MlData:
+    rawData = importRawData()
+    # Delete the row containing the species
+    X = np.delete(rawData, -1, axis=1)
+
+    classNames = ['Kama', 'Rosa', 'Canadian']
+    attributeNames = [
+        'Area A',
+        'perimeter P',
+        'compactness C',
+        'length of kernel',
+        'width of kernel',
+        'asymmetry coefficient',
+        'length of kernel groove',
+    ] + classNames
+    classLabels = rawData[:, -1] - 1
+    return MlData(classNames=classNames, attributeNames=attributeNames, X=X, classLabels=classLabels)
