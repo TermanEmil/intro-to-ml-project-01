@@ -4,7 +4,7 @@ from main import importData2
 
 
 def visualise():
-    data = importData2().toCentered()
+    data = importData2()
 
     attributeCombos = [
         (0, 1), (0, 2), (2, 6),
