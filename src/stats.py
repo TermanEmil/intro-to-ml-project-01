@@ -24,4 +24,5 @@ print(stats)
 
 
 # Pairwise correlation - which ones are compared where??
-pd.DataFrame(np.corrcoef(X,rowvar=False))       # rowvar false since the variables are the columns
+pd.DataFrame(np.corrcoef(X,rowvar=False),       # rowvar false since the variables are the columns
+             index=attributeNames,columns=attributeNames)
