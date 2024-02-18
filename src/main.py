@@ -1,4 +1,8 @@
+import dataclasses
+from dataclasses import dataclass
+from functools import cached_property
 from typing import List, Tuple
+from scipy import linalg
 
 import numpy as np
 import pandas as pd
@@ -39,3 +43,71 @@ def importData() -> Tuple[np.ndarray, List]:
     ]
     return X, attributeNames
 
+
+@dataclass
+class MlData:
+    classNames: List[str]
+    attributeNames: List[str]
+    X: np.ndarray
+    classLabels: np.ndarray
+
+    @property
+    def observationsCount(self):
+        return len(self.classLabels)
+
+    @property
+    def attributesCount(self):
+        return self.X.shape[1]
+
+    def centered(self) -> 'MlData':
+        # Subtract the mean from the data
+        data = dataclasses.replace(self)
+        data.X = data.X - np.ones((data.observationsCount, 1)) * data.X.mean(axis=0)
+        return data
+
+    def standardized(self) -> 'MlData':
+        # Center and divide by the attribute standard deviation to obtain a standardized dataset
+        data = self.centered()
+        data.X = data.X * (1 / np.std(data.X, axis=0))
+        return data
+
+    # noinspection PyTupleAssignmentBalance
+    def computePca(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        :return: (
+            U matrix from svd();
+            S matrix from svd();
+            V matrix from svd() but transposed;
+            Z matrix with the data projected onto PCA space;
+        )
+        """
+
+        # PCA by computing SVD of Y
+        U, S, Vh = linalg.svd(self.X, full_matrices=False)
+
+        # scipy.linalg.svd returns "Vh", which is the Hermitian (transpose)
+        # of the vector V. So, for us to obtain the correct V, we transpose:
+        V = Vh.T
+
+        # Project the centered data onto principal component space
+        Z = self.X @ V
+        return U, S, V, Z
+
+
+def importData2() -> MlData:
+    rawData = importRawData()
+    # Delete the row containing the species
+    X = np.delete(rawData, -1, axis=1)
+
+    classNames = ['Kama', 'Rosa', 'Canadian']
+    attributeNames = [
+        'Area A',
+        'perimeter P',
+        'compactness C',
+        'length of kernel',
+        'width of kernel',
+        'asymmetry coefficient',
+        'length of kernel groove',
+    ]
+    classLabels = rawData[:, -1] - 1
+    return MlData(classNames=classNames, attributeNames=attributeNames, X=X, classLabels=classLabels)
