@@ -59,6 +59,10 @@ class MlData:
     def attributesCount(self):
         return self.X.shape[1]
 
+    @property
+    def dataFrame(self):
+        return pd.DataFrame(self.X, columns=self.attributeNames)
+
     def centered(self) -> 'MlData':
         # Subtract the mean from the data
         data = dataclasses.replace(self)
