@@ -114,4 +114,5 @@ def importData2() -> MlData:
         'length of kernel groove',
     ]
     classLabels = rawData[:, -1] - 1
+    print('hi Ady')
     return MlData(classNames=classNames, attributeNames=attributeNames, X=X, classLabels=classLabels)
