@@ -1,28 +1,24 @@
 
 from main import *
+from statistics import multimode
 
 
 # Find attribute names for raw data
 X, attributeNames = importData()
 attributeNames = attributeNames[:-3]
-attributeNames.append('species')
-# Import raw data instead of 1-out-of-K encoded
+# Import raw species data instead of 1-out-of-K encoded
 X = importRawData()
 
-
-# Calculate statistics
-mean_X = X.mean(axis=0)
-std_X = X.std(axis=0,ddof=1)
-median_X = np.median(X,axis=0)
-range_X = X.max(axis=0) - X.min(axis=0)
+# Calculate statistics for continuous attributes
+mean_X = np.round(X[:,:-1].mean(axis=0),2)
+std_X = np.round(X[:,:-1].std(axis=0,ddof=1),3)
+median_X = np.round(np.median(X[:,:-1],axis=0),2)
 
 # Display summary statistics as a table with row and column names
-stats = pd.DataFrame(np.column_stack([mean_X,median_X,std_X,range_X]),
+stats = pd.DataFrame(np.column_stack([mean_X,median_X,std_X]),
                      index=attributeNames,
-                     columns=["Mean","Median","Standard deviation","Range"])
+                     columns=["Mean","Median","Standard deviation"])
 print(stats)
 
-
-# Pairwise correlation - which ones are compared where??
-pd.DataFrame(np.corrcoef(X,rowvar=False),       # rowvar false since the variables are the columns
-             index=attributeNames,columns=attributeNames)
+# Determine mode of species
+print(multimode(X[:,-1]))
