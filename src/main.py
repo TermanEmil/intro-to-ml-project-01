@@ -11,7 +11,7 @@ import pandas as pd
 def importRawData() -> np.ndarray:
     filename = '../data/seeds_dataset.txt'
     # There are rows with multiple tabs, we have to use a regex delimiter separating by one or more separators.
-    df = pd.read_csv(filename, delimiter=r"\s+")
+    df = pd.read_csv(filename, delimiter=r"\s+", header=None)
     return df.values
 
 
