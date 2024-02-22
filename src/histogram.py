@@ -3,10 +3,13 @@ import numpy as np
 from main import importData2
 from matplotlib import pyplot as plt
 
-# Visualising Histogram on attributes of the data
-# refer exercise 4_3_1
 
 def visualise_histogram():
+    """
+    Visualising Histogram on attributes of the data
+    refer exercise 4_3_1
+    """
+
     data = importData2()
     M = data.attributesCount
     C = len(data.classNames)
@@ -23,7 +26,6 @@ def visualise_histogram():
         subplot(int(u), int(v), i + 1)
         hist(X[:, i])
         xlabel(attributeName[i])
-       
        
     show()
 
