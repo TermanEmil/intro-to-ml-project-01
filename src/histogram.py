@@ -7,7 +7,7 @@ from main import importData2
 
 def visualise_histogram():
     """
-    Visualising Histogram on attributes of the data
+    Visualising Histogram on all attributes
     refer exercise 4_3_1
     """
 
@@ -18,6 +18,8 @@ def visualise_histogram():
     y = data.classLabels
     N = data.observationsCount
     attributeName = data.attributeNames
+
+    # Bins refers to the number of bars to draw
     binsCount = 10
 
     u = np.floor(np.sqrt(M))
