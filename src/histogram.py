@@ -1,7 +1,8 @@
-from matplotlib.pyplot import hist, show, subplot, title, xlabel
 import numpy as np
-from main import importData2
 from matplotlib import pyplot as plt
+from matplotlib.pyplot import hist, show, subplot, xlabel
+
+from main import importData2
 
 
 def visualise_histogram():
@@ -24,9 +25,15 @@ def visualise_histogram():
     v = np.ceil(float(M) / u)
     for i in range(M):
         subplot(int(u), int(v), i + 1)
-        hist(X[:, i])
         xlabel(attributeName[i])
-       
+
+        # Stacked histograms
+        classMasks = [data.classLabels == classIndex for classIndex in range(len(data.classNames))]
+        histData = [X[mask, i] for mask in classMasks]
+        hist(histData, alpha=0.7, label=data.classNames, stacked=True)
+        # plt.legend(data.classNames, bot)
+
+    figure.legend(data.classNames,  bbox_to_anchor=(0.9, 0.2))
     show()
 
 
