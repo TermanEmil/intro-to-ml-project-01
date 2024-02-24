@@ -32,13 +32,13 @@ def importData() -> Tuple[np.ndarray, List]:
     rawData = importRawData()
     X = transformSpeciesColumnIntoOneOutOfKEncoding(rawData)
     attributeNames = [
-        'Area A',
-        'perimeter P',
-        'compactness C',
-        'length of kernel',
-        'width of kernel',
-        'asymmetry coefficient',
-        'length of kernel groove',
+        'area',
+        'perimeter',
+        'compactness',
+        'kernel len',
+        'kernel width',
+        'asymmetry',
+        'kernel groove len',
         'Kama', 'Rosa', 'Canadian'
     ]
     return X, attributeNames
@@ -105,13 +105,13 @@ def importData2() -> MlData:
 
     classNames = ['Kama', 'Rosa', 'Canadian']
     attributeNames = [
-        'Area A',
-        'perimeter P',
-        'compactness C',
-        'length of kernel',
-        'width of kernel',
-        'asymmetry coefficient',
-        'length of kernel groove',
+        'area',
+        'perimeter',
+        'compactness',
+        'kernel len',
+        'kernel width',
+        'asymmetry',
+        'kernel groove len',
     ]
     classLabels = rawData[:, -1] - 1
     return MlData(classNames=classNames, attributeNames=attributeNames, X=X, classLabels=classLabels)
