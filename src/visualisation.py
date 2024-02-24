@@ -68,9 +68,9 @@ def visualisePcaCoefficients():
     figure.suptitle("PCA Component Coefficients")
 
     pcasCount = data.attributesCount
-    bw = 0.1
+    bw = 0.2
     r = np.arange(1, data.attributesCount + 1)
-    for i in range(pcasCount):
+    for i in range(pcasCount)[:3]:
         ax.bar(r + i * bw, V[:, i], width=bw)
     ax.set_xticks(r + bw, data.attributeNames)
     ax.set_xlabel("Attributes")
