@@ -41,21 +41,25 @@ def visualisePca():
     U, S, V, Z = data.computePca()
 
     pcaIndexCombo = [
-        (0, 1), (0, 2), (0, 3),
-        (1, 2), (1, 3), (2, 3),
+        (0, 1), (0, 2), (1, 2),
     ]
 
-    figure, axs = plt.subplots(2, 3)
+    figure, axs = plt.subplots(2, 2)
     figure.suptitle('Grain properties: PCAs')
-    for i, ax in enumerate(axs.flat):
+
+    # Hide the last subplot
+    axs.flat[-1].set_axis_off()
+
+    # Draw only on the first 3 subplots
+    for i, ax in enumerate(axs.flat[:-1]):
         pcaIndex1, pcaIndex2 = pcaIndexCombo[i]
         for classIndex in range(len(data.classNames)):
             classMask = data.classLabels == classIndex
             xData = Z[classMask, pcaIndex1]
             yData = Z[classMask, pcaIndex2]
             ax.plot(xData, yData, 'o', alpha=0.3)
-        ax.set_xlabel(f'PCA{pcaIndex1}')
-        ax.set_ylabel(f'PCA{pcaIndex2}')
+        ax.set_xlabel(f'PCA{pcaIndex1 + 1}')
+        ax.set_ylabel(f'PCA{pcaIndex2 + 1}')
         ax.legend(data.classNames)
 
 
