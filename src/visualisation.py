@@ -152,8 +152,34 @@ def visualisePcaInOriginalData():
     figure.legend(lastPcaPlots, pcaLabels, loc='lower right')
 
 
+def visualiseAllAttributes():
+    data = importData2().standardized()
+
+    figure, axs = plt.subplots(data.attributesCount, data.attributesCount)
+    figure.suptitle('Grain properties')
+
+    for attributeIndex1 in range(data.attributesCount):
+        for attributeIndex2 in range(data.attributesCount):
+            ax = axs[attributeIndex1, attributeIndex2]
+            for classIndex in range(len(data.classNames)):
+                classMask = data.classLabels == classIndex
+                xData = data.X[classMask, attributeIndex1]
+                yData = data.X[classMask, attributeIndex2]
+                ax.plot(xData, yData, '.', alpha=1)
+                if attributeIndex1 == data.attributesCount - 1:
+                    ax.set_xlabel(data.attributeNames[attributeIndex2])
+                else:
+                    ax.set_xticks([])
+                if attributeIndex2 == 0:
+                    ax.set_ylabel(data.attributeNames[attributeIndex1])
+                else:
+                    ax.set_yticks([])
+    figure.legend(data.classNames)
+
+
 visualise2DAttributes()
 visualisePca()
 visualisePcaCoefficients()
 visualisePcaInOriginalData()
+visualiseAllAttributes()
 plt.show()
