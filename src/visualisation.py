@@ -165,7 +165,7 @@ def visualiseAllAttributes():
                 classMask = data.classLabels == classIndex
                 xData = data.X[classMask, attributeIndex1]
                 yData = data.X[classMask, attributeIndex2]
-                ax.plot(xData, yData, '.', alpha=1)
+                ax.plot(xData, yData, '.', alpha=0.4)
                 if attributeIndex1 == data.attributesCount - 1:
                     ax.set_xlabel(data.attributeNames[attributeIndex2])
                 else:
