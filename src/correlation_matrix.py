@@ -25,7 +25,11 @@ def drawCorrelationMatrix(data: MlData):
 
     # Show the values directly on the grid
     for (i, j), z in np.ndenumerate(correlationMatrix):
-        plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center')
+        if z <= 0.1:
+            color = 'white'
+        else:
+            color = 'black'
+        plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center', color=color)
 
     plt.title('Correlation Matrix')
 
