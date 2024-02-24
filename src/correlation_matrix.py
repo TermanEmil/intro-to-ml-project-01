@@ -31,6 +31,7 @@ def drawCorrelationMatrix(data: MlData):
             color = 'black'
         plt.text(j, i, '{:0.1f}'.format(z), ha='center', va='center', color=color)
 
+    plt.colorbar()
     plt.title('Correlation Matrix')
 
     plt.show()
