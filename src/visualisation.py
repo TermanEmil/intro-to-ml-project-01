@@ -74,7 +74,7 @@ def visualisePcaCoefficients():
     pcasCount = data.attributesCount
     bw = 0.2
     r = np.arange(1, data.attributesCount + 1)
-    for i in range(pcasCount)[:3]:
+    for i in range(pcasCount)[:2]:
         ax.bar(r + i * bw, V[:, i], width=bw)
     ax.set_xticks(r + bw, data.attributeNames)
     ax.set_xlabel("Attributes")
@@ -155,23 +155,24 @@ def visualisePcaInOriginalData():
 def visualiseAllAttributes():
     data = importData2().standardized()
 
-    figure, axs = plt.subplots(data.attributesCount, data.attributesCount)
+    figure = plt.figure(figsize=(12, 12))
     figure.suptitle('Grain properties')
+    M = data.attributesCount
 
-    for attributeIndex1 in range(data.attributesCount):
-        for attributeIndex2 in range(data.attributesCount):
-            ax = axs[attributeIndex1, attributeIndex2]
+    for m1 in range(data.attributesCount):
+        for m2 in range(data.attributesCount):
+            ax = plt.subplot(M, M, m1 * M + m2 + 1)
             for classIndex in range(len(data.classNames)):
                 classMask = data.classLabels == classIndex
-                xData = data.X[classMask, attributeIndex1]
-                yData = data.X[classMask, attributeIndex2]
+                xData = data.X[classMask, m1]
+                yData = data.X[classMask, m2]
                 ax.plot(xData, yData, '.', alpha=0.4)
-                if attributeIndex1 == data.attributesCount - 1:
-                    ax.set_xlabel(data.attributeNames[attributeIndex2])
+                if m1 == data.attributesCount - 1:
+                    ax.set_xlabel(data.attributeNames[m2])
                 else:
                     ax.set_xticks([])
-                if attributeIndex2 == 0:
-                    ax.set_ylabel(data.attributeNames[attributeIndex1])
+                if m2 == 0:
+                    ax.set_ylabel(data.attributeNames[m1])
                 else:
                     ax.set_yticks([])
     figure.legend(data.classNames)
