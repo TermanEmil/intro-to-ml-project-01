@@ -44,22 +44,20 @@ def visualisePca():
         (0, 1), (0, 2), (1, 2),
     ]
 
-    figure, axs = plt.subplots(2, 2)
+    figure, axs = plt.subplots(1, 3)
     figure.suptitle('Grain properties: PCAs')
+    figure.set_figheight(5)
+    figure.set_figwidth(15)
 
-    # Hide the last subplot
-    axs.flat[-1].set_axis_off()
-
-    # Draw only on the first 3 subplots
-    for i, ax in enumerate(axs.flat[:-1]):
+    for i, ax in enumerate(axs.flat):
         pcaIndex1, pcaIndex2 = pcaIndexCombo[i]
         for classIndex in range(len(data.classNames)):
             classMask = data.classLabels == classIndex
             xData = Z[classMask, pcaIndex1]
             yData = Z[classMask, pcaIndex2]
             ax.plot(xData, yData, 'o', alpha=0.3)
-        ax.set_xlabel(f'PCA{pcaIndex1 + 1}')
-        ax.set_ylabel(f'PCA{pcaIndex2 + 1}')
+        ax.set_xlabel(f'PC{pcaIndex1 + 1}')
+        ax.set_ylabel(f'PC{pcaIndex2 + 1}')
         ax.legend(data.classNames)
 
 
@@ -67,14 +65,14 @@ def visualisePcaCoefficients():
     data = importData2().standardized()
     U, S, V, Z = data.computePca()
 
-    figure = plt.figure()
+    figure = plt.figure(figsize=(8, 10))
     ax = figure.add_subplot()
-    figure.suptitle("PCA Component Coefficients")
+    figure.suptitle("PC Coefficients")
 
     pcasCount = data.attributesCount
     bw = 0.2
     r = np.arange(1, data.attributesCount + 1)
-    for i in range(pcasCount)[:2]:
+    for i in range(pcasCount)[:3]:
         ax.bar(r + i * bw, V[:, i], width=bw)
     ax.set_xticks(r + bw, data.attributeNames)
     ax.set_xlabel("Attributes")
@@ -92,11 +90,11 @@ def visualisePcaInOriginalData():
     U, S, V, Z = data.standardized().computePca()
 
     figure, axs = plt.subplots(2, 3)
-    figure.suptitle('Grain properties with PCA vectors')
+    figure.suptitle('Grain properties with PC vectors')
 
     pcaColors = ['tab:pink', 'tab:olive', 'tab:cyan']
     pcaIndexes = [0, 1]
-    pcaLabels = [f'PCA{i + 1}' for i in pcaIndexes]
+    pcaLabels = [f'PC{i + 1}' for i in pcaIndexes]
     lastPcaPlots = []
 
     for i, ax in enumerate(axs.flat):
@@ -132,7 +130,7 @@ def visualisePcaInOriginalData():
                 0, 0, pca[0] * 100, pca[1] * 100,
                 head_width=0, head_length=0,
                 color=pcaColors[pcaIndex],
-                label=f'PCA{pcaIndex + 1}'
+                label=f'PC{pcaIndex + 1}'
             )
             lastPcaPlots.append(pcaPlot)
             ax.arrow(
