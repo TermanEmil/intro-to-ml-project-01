@@ -1,6 +1,6 @@
 import numpy
 
-from src.main import importData2
+from main import importData2
 
 
 def import_regression_data(label_to_predict: str) -> [numpy.ndarray, numpy.ndarray]:
