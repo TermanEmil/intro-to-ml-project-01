@@ -11,16 +11,15 @@ N, M = X_r.shape
 
 # Regularization strength and hidden units
 rs = np.power(10.0, range(-5, 9))       # make sure it matches part a!!
-hu = np.arange(1, 3, 5)                 # change to right ones!!
+hu = np.arange(1, 5)                    # change to right ones!!
 
-# Define ANN models
-ann_models = []
-for i in range(len(hu)):
-    ann_models.append(lambda: torch.nn.Sequential(
-        torch.nn.Linear(M, hu[i]),
-        torch.nn.Tanh(),
-        torch.nn.Linear(hu[i], 1)
-    ))
+# Define ANN model
+h = hu[0]
+ann_model = lambda: torch.nn.Sequential(
+    torch.nn.Linear(M, h),
+    torch.nn.Tanh(),
+    torch.nn.Linear(h, 1)
+)
 loss_fn = torch.nn.MSELoss()
 max_iter = 10000
 
@@ -30,7 +29,7 @@ attribute_names = ["Offset"] + attribute_names
 M = M + 1
 
 # K-fold crossvalidation
-K = 10
+K = 2
 CV = model_selection.KFold(n_splits=K, shuffle=True)
 
 k1 = 0
@@ -41,6 +40,8 @@ M_reg = np.empty(K)
 M_ann = np.empty(K)
 
 for par_index, test_index in CV.split(X_r, y_r):
+    print("\nOuter crossvalidation fold: {0}/{1}".format(k1 + 1, K))
+
     # extract training and test set for current outer CV fold
     X_par, y_par = X_r[par_index, :], y_r[par_index]
     X_test, y_test = X_r[test_index, :], y_r[test_index]
@@ -76,10 +77,13 @@ for par_index, test_index in CV.split(X_r, y_r):
     # Remove offset for ANN
     X_par = X_par[:, 1:]
     X_test = X_test[:, 1:]
+    M = M-1
 
     k2 = 0
     E_val_ann = np.empty((len(hu), K))
     for train_index, val_index in CV.split(X_par, y_par):
+        print("\nANN crossvalidation fold: {0}/{1}".format(k2 + 1, K))
+
         # Extract training and test set for current inner CV fold
         X_train = torch.Tensor(X_par[train_index, :])
         y_train = torch.Tensor(y_par[train_index])
@@ -88,13 +92,17 @@ for par_index, test_index in CV.split(X_r, y_r):
 
         # Train ANN model with different hidden units
         for i in range(len(hu)):
+            h = hu[i]
+            print("Training model of type:\n{}\n".format(str(ann_model())))
             ann, final_loss, learning_curve = train_neural_net(
-                ann_models[i], loss_fn, X=X_train, y=y_train, n_replicates=3, max_iter=max_iter
+                ann_model, loss_fn, X=X_train, y=y_train, n_replicates=3, max_iter=max_iter
             )
 
             # Determine validation error
             y_est = ann(X_val)
-            se = (y_est.float() - y_val.float()) ** 2
+            se = list()
+            for j in range(len(y_est)):
+                se.append((y_est[j] - y_val[j]) ** 2)
             E_val_ann[i, k2] = (sum(se).type(torch.float) / len(y_val)).data.numpy()
         
         k2 += 1
@@ -110,15 +118,17 @@ for par_index, test_index in CV.split(X_r, y_r):
     y_par = torch.Tensor(y_par)
     X_test = torch.Tensor(X_test)
     y_test = torch.Tensor(y_test)
+    h = M_ann[k1]
     ann, final_loss, learning_curve = train_neural_net(
-        ann_models[M_ann[k1]], loss_fn, X=X_par, y=y_par, n_replicates=3, max_iter=max_iter
+        ann_model, loss_fn, X=X_par, y=y_par, n_replicates=3, max_iter=max_iter
     )
 
     # Determine test error for best number of hidden units
     y_est = ann(X_test)
-    se = (y_est.float() - y_test.float()) ** 2
+    se = list()
+    for j in range(len(y_est)):
+        se.append((y_est[j] - y_val[j]) ** 2)
     E_test_ann[k1] = (sum(se).type(torch.float) / len(y_test)).data.numpy()
-
     k1 += 1
 
 # Output as table
