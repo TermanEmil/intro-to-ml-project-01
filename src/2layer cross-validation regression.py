@@ -10,7 +10,7 @@ X_r, y_r, attribute_names = import_regression_data('compactness')
 N, M = X_r.shape
 
 # Regularization strength and hidden units
-rs = np.power(10.0, range(-5, 9))       # make sure it matches part a!!
+rs = np.power(10.0, range(-7, 5))
 hu = np.arange(1, 5)                    # change to right ones!!
 
 # Define ANN model
@@ -26,10 +26,9 @@ max_iter = 10000
 # Add offset attribute for regularization
 X_r = np.concatenate((np.ones((X_r.shape[0], 1)), X_r), 1)
 attribute_names = ["Offset"] + attribute_names
-M = M + 1
 
 # K-fold crossvalidation
-K = 2
+K = 10
 CV = model_selection.KFold(n_splits=K, shuffle=True)
 
 k1 = 0
@@ -59,6 +58,7 @@ for par_index, test_index in CV.split(X_r, y_r):
     ) = rlr_validate(X_par, y_par, rs, K)
 
     # Train model on training data
+    M = M + 1
     mu = np.mean(X_par[:, 1:], 0)
     sigma = np.std(X_par[:, 1:], 0)
     X_par_stand = X_par.copy()
@@ -77,7 +77,7 @@ for par_index, test_index in CV.split(X_r, y_r):
     # Remove offset for ANN
     X_par = X_par[:, 1:]
     X_test = X_test[:, 1:]
-    M = M-1
+    M = M - 1
 
     k2 = 0
     E_val_ann = np.empty((len(hu), K))
@@ -118,7 +118,8 @@ for par_index, test_index in CV.split(X_r, y_r):
     y_par = torch.Tensor(y_par)
     X_test = torch.Tensor(X_test)
     y_test = torch.Tensor(y_test)
-    h = M_ann[k1]
+    h = int(M_ann[k1])
+    print("Training model of type:\n{}\n".format(str(ann_model())))
     ann, final_loss, learning_curve = train_neural_net(
         ann_model, loss_fn, X=X_par, y=y_par, n_replicates=3, max_iter=max_iter
     )
@@ -127,7 +128,7 @@ for par_index, test_index in CV.split(X_r, y_r):
     y_est = ann(X_test)
     se = list()
     for j in range(len(y_est)):
-        se.append((y_est[j] - y_val[j]) ** 2)
+        se.append((y_est[j] - y_test[j]) ** 2)
     E_test_ann[k1] = (sum(se).type(torch.float) / len(y_test)).data.numpy()
     k1 += 1
 
