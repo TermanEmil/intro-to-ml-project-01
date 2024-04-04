@@ -40,8 +40,8 @@ E_test_bas = np.empty(K)
 M_reg = np.empty(K)
 M_ann = np.empty(K)
 
+# Save splits for use in statistical comparison
 splits = []
-
 for par_index, test_index in CV.split(X_r, y_r):
     splits.append((par_index,test_index))
     print("\nOuter crossvalidation fold: {0}/{1}".format(k1 + 1, K))
@@ -83,7 +83,7 @@ for par_index, test_index in CV.split(X_r, y_r):
     X_par = X_par[:, 1:]
     X_test = X_test[:, 1:]
     M = M - 1
-
+    
     k2 = 0
     E_val_ann = np.empty((len(hu), K))
     for train_index, val_index in CV.split(X_par, y_par):
@@ -180,7 +180,7 @@ r_ann_bas = np.empty(K)
 r_ann_reg = np.empty(K)
 r_reg_bas = np.empty(K)
 k=0
-for train_index, val_index in splits:
+for par_index, test_index in splits:
     X_par, y_par = X_r[par_index, :], y_r[par_index]
     X_test, y_test = X_r[test_index, :], y_r[test_index]
 
@@ -203,12 +203,12 @@ for train_index, val_index in splits:
 
     # Determine test error for optimal regularization strength
     E_reg = np.square(y_test - X_test_stand @ w_rlr)
-
+    
     # Remove offset for ANN
     X_par = X_par[:, 1:]
     X_test = X_test[:, 1:]
     M = M - 1
-
+    
     # Train ANN model on training data
     X_par = torch.Tensor(X_par)
     y_par = torch.Tensor(y_par)
