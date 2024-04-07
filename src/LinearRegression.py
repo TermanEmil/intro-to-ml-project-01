@@ -98,7 +98,7 @@ plt.ylabel('Mean Squared Error')
 plt.title('Mean Squared Error vs. log10(Lambda)')
 plt.grid(True)
 plt.legend()
-# plt.show()
+plt.show()
 
 
 # Plot coefficients vs. Lambda
