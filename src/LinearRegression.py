@@ -30,7 +30,7 @@ K = 10
 kf = KFold(n_splits=K, shuffle=True, random_state=1)
 
 # Define lambda values to search
-lambdas = np.logspace(-3, -1.5, 1000)
+lambdas = np.logspace(-3, 2,50)
 
 # Dictionary to store mean MSE for each lambda
 mean_mse_values = {}
