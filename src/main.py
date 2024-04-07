@@ -63,6 +63,14 @@ class MlData:
     def dataFrame(self):
         return pd.DataFrame(self.X, columns=self.attributeNames)
 
+    @property
+    def oneOutOfKEncodedClassLabels(self):
+        classLabels = np.array(self.classLabels, dtype=int).T
+        maxClassValue = int(self.classLabels.max()) + 1
+        encoded = np.zeros((classLabels.size, maxClassValue), dtype=int)
+        encoded[np.arange(classLabels.size), classLabels - 1] = 1
+        return encoded
+
     def centered(self) -> 'MlData':
         # Subtract the mean from the data
         data = dataclasses.replace(self)
