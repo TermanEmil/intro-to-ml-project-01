@@ -1,10 +1,8 @@
-import os
+import random
 
 import numpy as np
 import progressbar
 import torch
-import random
-
 from dtuimldmtools import train_neural_net
 from sklearn import model_selection
 from sklearn.dummy import DummyClassifier
@@ -12,8 +10,17 @@ from sklearn.linear_model import LogisticRegression
 
 from main import importData2
 
-
 random_state = 1
+
+
+def _build_outer_fold_header_str(fold_i, total_folds, y_train, y_test):
+    return (
+        f'\n{"=" * 20} '
+        f'Outer crossvalidation fold: {fold_i + 1}/{total_folds} '
+        f'(train: {len(y_train)} | test: {len(y_test)})'
+        f'\n\tTrain class distribution: {sum(y_train == 0)} | {sum(y_train == 1)} | {sum(y_train == 2)}'
+        f'\n\tTest class distribution: {sum(y_test == 0)} | {sum(y_test == 1)} | {sum(y_test == 2)}'
+    )
 
 
 def benchmark_logistic_regression_model():
@@ -33,16 +40,12 @@ def benchmark_logistic_regression_model():
 
     lambda_value_with_its_test_error_rate = np.empty(outer_folds_count, dtype=tuple)
 
-    outer_folder = model_selection.StratifiedKFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
+    outer_folder = model_selection.KFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
     for outer_fold, (outer_train_i, outer_test_i) in enumerate(outer_folder.split(X, y)):
         outer_X_train, outer_y_train = X[outer_train_i, :], y[outer_train_i]
         outer_X_test, outer_y_test = X[outer_test_i, :], y[outer_test_i]
 
-        print(
-            f'\n{"=" * 20} '
-            f'Outer crossvalidation fold: {outer_fold + 1}/{outer_folds_count} '
-            f'(train: {len(outer_y_train)} | test: {len(outer_y_test)})'
-        )
+        print(_build_outer_fold_header_str(outer_fold, outer_folds_count, outer_y_train, outer_y_test))
 
         # Compute the testing error of different lambda_values across multiples folds
         inner_test_error_rate = np.empty((len(lambda_values), inner_folds_count))
@@ -131,16 +134,12 @@ def benchmark_ann_model():
 
     complexity_param_with_its_test_error_rate = np.empty(outer_folds_count, dtype=tuple)
 
-    outer_folder = model_selection.StratifiedKFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
+    outer_folder = model_selection.KFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
     for outer_fold, (outer_train_i, outer_test_i) in enumerate(outer_folder.split(X, y)):
         outer_X_train, outer_y_train = X[outer_train_i, :], y[outer_train_i]
         outer_X_test, outer_y_test = X[outer_test_i, :], y[outer_test_i]
 
-        print(
-            f'\n{"=" * 20} '
-            f'Outer crossvalidation fold: {outer_fold + 1}/{outer_folds_count} '
-            f'(train: {len(outer_y_train)} | test: {len(outer_y_test)})'
-        )
+        print(_build_outer_fold_header_str(outer_fold, outer_folds_count, outer_y_train, outer_y_test))
 
         # Compute the testing error of different complexity parameters across multiples folds
         inner_test_error_rate = np.empty((len(hidden_units_range), inner_folds_count))
@@ -208,12 +207,13 @@ def benchmark_baseline_model():
 
     test_error_rate = np.empty(outer_folds_count)
 
-    outer_folder = model_selection.StratifiedKFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
+    outer_folder = model_selection.KFold(n_splits=outer_folds_count, shuffle=True, random_state=random_state)
     for outer_fold, (outer_train_i, outer_test_i) in enumerate(outer_folder.split(X, y)):
         outer_X_train, outer_y_train = X[outer_train_i, :], y[outer_train_i]
         outer_X_test, outer_y_test = X[outer_test_i, :], y[outer_test_i]
 
         model = DummyClassifier(strategy='most_frequent')
+        # model = DummyClassifier(strategy='stratified')
         model.fit(outer_X_train, outer_y_train)
         test_predictions = model.predict(outer_X_test)
         test_error_rate[outer_fold] = np.sum(test_predictions != outer_y_test) / len(outer_y_test)
@@ -224,9 +224,9 @@ def benchmark_baseline_model():
 
 
 def main():
-    # benchmark_logistic_regression_model()
+    benchmark_logistic_regression_model()
     # benchmark_ann_model()
-    benchmark_baseline_model()
+    # benchmark_baseline_model()
     pass
 
 
