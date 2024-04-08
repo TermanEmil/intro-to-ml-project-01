@@ -10,6 +10,9 @@ from sklearn.preprocessing import OneHotEncoder
 from main import importData2
 
 
+random_state = 1
+
+
 def main():
     data = importData2().standardized()
     X = data.X
@@ -21,9 +24,9 @@ def main():
     attributeNames = data.attributeNames
     classNames = data.classNames
 
-    max_iter = 10000
+    max_iter = 100
 
-    n_hidden_units = 10
+    n_hidden_units = 1
     model = lambda: torch.nn.Sequential(
         torch.nn.Linear(M, n_hidden_units),
         torch.nn.ReLU(),
@@ -48,7 +51,7 @@ def main():
     errors = []
 
     K = 3
-    CV = model_selection.KFold(K, shuffle=True)
+    CV = model_selection.KFold(K, shuffle=True, random_state=random_state)
     for k, (train_index, test_index) in enumerate(CV.split(X, y)):
         print("\nCrossvalidation fold: {0}/{1}".format(k + 1, K))
         X_train = X[train_index, :]
@@ -108,7 +111,7 @@ def main():
     weights = [net[i].weight.data.numpy().T for i in [0, 2]]
     biases = [net[i].bias.data.numpy() for i in [0, 2]]
     tf = [str(net[i]) for i in [1, 3]]
-    draw_neural_net(weights, biases, tf)
+    draw_neural_net(weights, biases, tf, figsize=(5, 5), fontsizes=(10, 10))
 
 
 if __name__ == "__main__":
