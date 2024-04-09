@@ -1,12 +1,14 @@
 import random
 
 import numpy as np
+import pandas as pd
 import progressbar
 import torch
 from dtuimldmtools import train_neural_net, mcnemar, correlated_ttest
 from sklearn import model_selection
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
+from tabulate import tabulate
 
 from main import importData2
 
@@ -242,6 +244,10 @@ def benchmark_McNemar():
     N, M = X.shape
     C = len(data.classNames)
 
+    # # Delete a class
+    # X = np.delete(X, y == 2, axis=0)
+    # y = np.delete(y, y == 2)
+
     # Using the lambda from the second fold that gave a test error of 0
     logistic_regression_optimal_lambda = 0.005992285967408437
 
@@ -308,6 +314,12 @@ def benchmark_McNemar():
         all_baseline_predictions = all_baseline_predictions[:min_size]
 
     print(f'A total of {len(np.concatenate(y_true))} predictions')
+
+    logistic_regression_coeficients = pd.DataFrame(
+        zip(data.attributeNames, np.transpose(logistic_regression_model.coef_)),
+        columns=['features', 'coeficients']
+    )
+    print(tabulate(logistic_regression_coeficients, headers='keys', tablefmt='psql'))
 
     combinations = [
         ('Logistic vs ANN', all_logistic_regression_predictions, all_ann_predictions),
