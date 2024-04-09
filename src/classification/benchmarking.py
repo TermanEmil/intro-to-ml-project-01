@@ -19,7 +19,7 @@ logistic_regression_max_iterations = 20000
 
 # ANN constants
 ann_max_iterations = 3000
-ann_n_replicates = 1
+ann_n_replicates = 3
 
 
 def _build_outer_fold_header_str(fold_i, total_folds, y_train, y_test):
@@ -230,7 +230,7 @@ def benchmark_baseline_model():
     return test_error_rate
 
 
-def benchmark_McNemar():
+def benchmark_pairwise_comparison():
     random.seed(random_state)
     np.random.seed(random_state)
     torch.random.manual_seed(random_state)
@@ -251,13 +251,15 @@ def benchmark_McNemar():
     # Using the lambda from the second fold that gave a test error of 0
     logistic_regression_optimal_lambda = 0.005992285967408437
 
-    # Using 3 hidden units according to the ANN benchmark results
-    ann_optimal_hidden_units = 3
+    # Using 10 hidden units according to the ANN benchmark results
+    ann_optimal_hidden_units = 10
 
     y_true = []
     all_logistic_regression_predictions = []
     all_ann_predictions = []
     all_baseline_predictions = []
+
+    logistic_regression_coefficients = []
 
     try:
         for run_i in range(runs_count):
@@ -283,6 +285,7 @@ def benchmark_McNemar():
                 logistic_regression_model.fit(X_train, y_train)
                 logistic_regression_predictions = logistic_regression_model.predict(X_test).T
                 all_logistic_regression_predictions.append(logistic_regression_predictions)
+                logistic_regression_coefficients.append(logistic_regression_model.coef_)
 
                 # ANN
                 ann_net, _, _ = train_neural_net(
@@ -354,7 +357,7 @@ def main():
     # benchmark_logistic_regression_model()
     # benchmark_ann_model()
     # benchmark_baseline_model()
-    benchmark_McNemar()
+    benchmark_pairwise_comparison()
     pass
 
 
