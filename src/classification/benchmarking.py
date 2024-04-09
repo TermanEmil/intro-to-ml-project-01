@@ -231,6 +231,12 @@ def benchmark_baseline_model():
 
 
 def benchmark_pairwise_comparison():
+    """
+    For a large number of times (runs_count), run a KFold cross validation and save the predictions.
+    It is intended for the user to manually stop the process using SIGINT (Ctrl+C).
+    Once the application is terminated, the loops will stop, and it will compute the desired values
+      on the computations it managed to run so far.
+    """
     random.seed(random_state)
     np.random.seed(random_state)
     torch.random.manual_seed(random_state)
@@ -240,11 +246,11 @@ def benchmark_pairwise_comparison():
 
     data = importData2().standardized()
     X = data.X
-    y = data.classLabels
+    y = np.array(data.classLabels, dtype=int).T
     N, M = X.shape
     C = len(data.classNames)
 
-    # # Delete a class
+    # # Delete a class (useful when playing with the results)
     # X = np.delete(X, y == 2, axis=0)
     # y = np.delete(y, y == 2)
 
@@ -305,6 +311,7 @@ def benchmark_pairwise_comparison():
                 baseline_predictions = baseline_model.predict(X_test)
                 all_baseline_predictions.append(baseline_predictions)
     except KeyboardInterrupt:
+        # When SIGINT (Ctrl+C) is received, the loop will stop and prune the data to the smallest shape.
         min_size = min(
             len(y_true),
             len(all_logistic_regression_predictions),
@@ -318,6 +325,15 @@ def benchmark_pairwise_comparison():
 
     print(f'A total of {len(np.concatenate(y_true))} predictions')
 
+    # Save results to files (just in case)
+    base_path = './classification/outputs/benchmarks/test-runs-'
+    np.savetxt(f'{base_path}y-true.csv', y_true)
+    np.savetxt(f'{base_path}logistic-regression-predictions.csv', all_logistic_regression_predictions)
+    np.savetxt(f'{base_path}ann-predictions.csv', all_ann_predictions)
+    np.savetxt(f'{base_path}baseline-predictions.csv', all_ann_predictions)
+
+    # Logistic regression weights
+    # For a wider insight, present different aspects of the weights
     print('Coefficients for the first logistic regression')
     print(tabulate(pd.DataFrame(
         zip(data.attributeNames, np.around(np.transpose(logistic_regression_coefficients[0]), decimals=4)),
@@ -338,6 +354,7 @@ def benchmark_pairwise_comparison():
         columns=['features', 'coefficients']
     ), headers='keys', tablefmt='psql'))
 
+    # Pairwise comparison: p-value and Confidence Interval
     combinations = [
         ('Logistic vs ANN', all_logistic_regression_predictions, all_ann_predictions),
         ('Logistic vs Baseline', all_logistic_regression_predictions, all_baseline_predictions),
