@@ -5,24 +5,16 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 
-# Load data
-file_name = r"C:\Users\adity\OneDrive\Desktop\Sem 1\Intro to ML & DM\MC project-29th Feb'\seeds\seeds.txt"
-df = pd.read_csv(file_name, sep='\t', header=None)
-data = np.array(df.values)
-attributeNames= [
-        'area',
-        'perimeter',
-        'kernel len',
-        'kernel width',
-        'asymmetry',
-        'kernel groove len',
-        'Kama', 'Rosa', 'Canadian'
-    ]
+from main import importData, importData2
 
+# Load data
+imported_data = importData2()
 # Using area, perimeter, and kernel length to predict compactness
-X = data[:, [0, 1, 3, 4, 5 , 6]]  # Features
-Y = data[:, 2]  # Target variable - Compactness
+X = imported_data.X[:, [0, 1, 3, 4, 5, 6]]  # Features
+Y = imported_data.X[:, 2]  # Target variable - Compactness
 N, M = X.shape
+
+attributeNames = imported_data.attributeNames
 
 
 K = 10
@@ -30,7 +22,7 @@ K = 10
 kf = KFold(n_splits=K, shuffle=True, random_state=1)
 
 # Define lambda values to search
-lambdas = np.logspace(-3, 2,50)
+lambdas = np.logspace(-5, 2, 1000)
 
 # Dictionary to store mean MSE for each lambda
 mean_mse_values = {}
@@ -39,6 +31,7 @@ coefficients = {}
 
 for lambda_ in lambdas:
     mse_values = []
+    train_mse_values = []
     coeffs_for_lambda = []
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
@@ -89,10 +82,15 @@ print("Mean MSE:", mean_mse_values[best_lambda])
 
 # Plot mean squared error vs. Lambda
 plt.figure(figsize=(10, 8))
-plt.plot(np.log10(list(mean_mse_values.keys())), list(mean_mse_values.values()), linestyle='-')
+plt.plot(np.log10(list(mean_mse_values.keys())), list(mean_mse_values.values()), linestyle='-', label='Mean MSE')
 plt.scatter(np.log10([best_lambda]), mean_mse_values[best_lambda], color='red', marker='x', s=100)
-plt.annotate(f'Optimal Lambda (approx): {best_lambda:.2f}', xy=(np.log10(best_lambda), mean_mse_values[best_lambda]), xytext=(-80, 30),
-             textcoords='offset points', fontsize=12)
+plt.annotate(
+    f'Optimal Lambda (approx): {best_lambda:.5f}',
+    xy=(np.log10(best_lambda), mean_mse_values[best_lambda]),
+    xytext=(-80, 30),
+    textcoords='offset points',
+    fontsize=12
+)
 plt.xlabel('log10(Lambda)')
 plt.ylabel('Mean Squared Error')
 plt.title('Mean Squared Error vs. log10(Lambda)')
