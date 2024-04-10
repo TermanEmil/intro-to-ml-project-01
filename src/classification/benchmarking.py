@@ -291,7 +291,11 @@ def benchmark_pairwise_comparison():
                 logistic_regression_model.fit(X_train, y_train)
                 logistic_regression_predictions = logistic_regression_model.predict(X_test).T
                 all_logistic_regression_predictions.append(logistic_regression_predictions)
-                logistic_regression_coefficients.append(logistic_regression_model.coef_)
+
+                # Save the bias + coefficients of the logistic regression
+                logistic_regression_coefficients.append(np.insert(
+                    logistic_regression_model.coef_, 0, logistic_regression_model.intercept_, axis=1
+                ))
 
                 # ANN
                 ann_net, _, _ = train_neural_net(
@@ -334,23 +338,24 @@ def benchmark_pairwise_comparison():
 
     # Logistic regression weights
     # For a wider insight, present different aspects of the weights
+    lr_attributes = ['Bias', *data.attributeNames]
     print('Coefficients for the first logistic regression')
     print(tabulate(pd.DataFrame(
-        zip(data.attributeNames, np.around(np.transpose(logistic_regression_coefficients[0]), decimals=4)),
+        zip(lr_attributes, np.around(np.transpose(logistic_regression_coefficients[0]), decimals=4)),
         columns=['features', 'coefficients']
     ), headers='keys', tablefmt='psql'))
 
     print('Mean of the absolute values of the coefficients for logistic regression')
     mean_of_absolute_values = np.around(np.mean(np.fabs(logistic_regression_coefficients), axis=0), decimals=4)
     print(tabulate(pd.DataFrame(
-        zip(data.attributeNames, np.transpose(mean_of_absolute_values)),
+        zip(lr_attributes, np.transpose(mean_of_absolute_values)),
         columns=['features', 'coefficients']
     ), headers='keys', tablefmt='psql'))
 
     print('Mean of the coefficients for logistic regression')
     mean_of_absolute_values = np.around(np.mean(logistic_regression_coefficients, axis=0), decimals=4)
     print(tabulate(pd.DataFrame(
-        zip(data.attributeNames, np.transpose(mean_of_absolute_values)),
+        zip(lr_attributes, np.transpose(mean_of_absolute_values)),
         columns=['features', 'coefficients']
     ), headers='keys', tablefmt='psql'))
 
