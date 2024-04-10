@@ -373,9 +373,11 @@ def benchmark_pairwise_comparison():
         print(f'theta = {theta}; CI: {CI}; p-value: {p}')
 
         print('\nSetup II')
-        loss = 2
         r = [
-            np.mean(np.abs(model_a_predictions[i] - y_true[i]) ** loss - np.abs(model_b_predictions[i] - y_true[i]))
+            np.mean(
+                np.sum(model_a_predictions[i] != y_true[i]) / len(y_true[i]) -
+                np.sum(model_b_predictions[i] != y_true[i]) / len(y_true[i])
+            )
             for i in range(len(y_true))
         ]
         rho = 1 / folds_count
